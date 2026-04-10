@@ -321,46 +321,39 @@ const shareViaEmail = () => {
           </h3>
           
           <div class="space-y-2">
-            <label
+            <div
               v-for="item in items"
               :key="item.id"
+              @click="handleToggle(item.id)"
               :class="[
-                'flex items-center gap-3 p-3 rounded-xl cursor-pointer transition-all duration-200 group',
+                'flex items-center gap-3 p-3 rounded-xl cursor-pointer transition-all duration-200 group select-none',
                 item.packed 
                   ? 'bg-green-50 border-2 border-green-200' 
                   : 'bg-gray-50 hover:bg-blue-50 border-2 border-transparent hover:border-blue-200'
               ]"
             >
-              <div class="relative">
-                <input
-                  type="checkbox"
-                  :checked="item.packed"
-                  @change="handleToggle(item.id)"
-                  class="sr-only"
-                />
-                <div 
-                  :class="[
-                    'w-6 h-6 rounded-lg border-2 flex items-center justify-center transition-all duration-200',
-                    item.packed 
-                      ? 'bg-green-500 border-green-500 scale-110' 
-                      : 'border-gray-300 group-hover:border-blue-400'
-                  ]"
+              <div 
+                :class="[
+                  'w-6 h-6 rounded-lg border-2 flex items-center justify-center transition-all duration-200 flex-shrink-0',
+                  item.packed 
+                    ? 'bg-green-500 border-green-500' 
+                    : 'border-gray-300 group-hover:border-blue-400'
+                ]"
+              >
+                <svg 
+                  v-if="item.packed"
+                  class="w-4 h-4 text-white"
+                  fill="none" 
+                  stroke="currentColor" 
+                  viewBox="0 0 24 24"
                 >
-                  <svg 
-                    v-if="item.packed"
-                    class="w-4 h-4 text-white"
-                    fill="none" 
-                    stroke="currentColor" 
-                    viewBox="0 0 24 24"
-                  >
-                    <path 
-                      stroke-linecap="round" 
-                      stroke-linejoin="round" 
-                      stroke-width="3" 
-                      d="M5 13l4 4L19 7"
-                    />
-                  </svg>
-                </div>
+                  <path 
+                    stroke-linecap="round" 
+                    stroke-linejoin="round" 
+                    stroke-width="3" 
+                    d="M5 13l4 4L19 7"
+                  />
+                </svg>
               </div>
               <span 
                 :class="[
@@ -375,12 +368,12 @@ const shareViaEmail = () => {
               </span>
               <button
                 v-if="item.isCustom"
-                @click.prevent="tripStore.removeItem(item.id)"
+                @click.stop="tripStore.removeItem(item.id)"
                 class="text-red-400 hover:text-red-600 p-1 opacity-0 group-hover:opacity-100 transition-opacity"
               >
                 ✕
               </button>
-            </label>
+            </div>
           </div>
         </div>
       </div>
@@ -562,22 +555,3 @@ const shareViaEmail = () => {
     </div>
   </div>
 </template>
-
-<style scoped>
-/* Custom checkbox animation */
-input[type="checkbox"]:checked + div {
-  animation: checkmark 0.2s ease-out;
-}
-
-@keyframes checkmark {
-  0% {
-    transform: scale(0.8);
-  }
-  50% {
-    transform: scale(1.2);
-  }
-  100% {
-    transform: scale(1.1);
-  }
-}
-</style>
