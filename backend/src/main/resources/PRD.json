@@ -3,34 +3,46 @@
   "description": "Una app que genera listas de equipaje personalizadas según destino, fechas y actividades, considerando el clima y duración del viaje.",
   "requirements": [
     {
-      "title": "Página de inicio",
-      "description": "Landing page principal con información del producto",
-      "priority": "alta"
+      "id": 1,
+      "title": "Introducir datos del viaje",
+      "description": "El usuario puede introducir el destino, las fechas de inicio y fin del viaje, y seleccionar el tipo de actividades que va a realizar (playa, senderismo, ciudad, crucero).",
+      "type": "feature",
+      "priority": "high"
     },
     {
-      "title": "Autenticación de usuarios",
-      "description": "Login y registro con validación de formularios",
-      "priority": "alta"
+      "id": 2,
+      "title": "Generar lista personalizada según clima",
+      "description": "La app genera automáticamente una lista de cosas para llevar basándose en el clima del destino durante las fechas del viaje y la duración del mismo.",
+      "type": "feature",
+      "priority": "high"
     },
     {
-      "title": "Panel de administración",
-      "description": "Dashboard para gestionar los datos de la aplicación",
-      "priority": "media"
+      "id": 3,
+      "title": "Marcar artículos como empacados",
+      "description": "El usuario puede ir marcando cada artículo de la lista conforme lo mete en la maleta, para llevar control de lo que falta.",
+      "type": "feature",
+      "priority": "high"
     },
     {
-      "title": "API REST completa",
-      "description": "Endpoints CRUD para todas las entidades del dominio",
-      "priority": "alta"
+      "id": 4,
+      "title": "Compartir la lista",
+      "description": "El usuario puede compartir su lista de equipaje con otras personas, útil para viajes en grupo o familia.",
+      "type": "feature",
+      "priority": "medium"
     },
     {
-      "title": "Diseño responsive",
-      "description": "Interfaz adaptada a móvil, tablet y escritorio",
-      "priority": "media"
+      "id": 5,
+      "title": "Estilo visual fresco tipo app de viajes",
+      "description": "La app tiene un diseño fresco y colorido inspirado en aplicaciones de viajes, usando principalmente colores azules y naranjas para transmitir energía y dinamismo.",
+      "type": "ui",
+      "priority": "high"
     },
     {
-      "title": "Tests unitarios",
-      "description": "Cobertura de tests para la lógica de negocio principal",
-      "priority": "baja"
+      "id": 6,
+      "title": "Añadir artículos personalizados a la lista",
+      "description": "El usuario puede añadir sus propios artículos a la lista de equipaje, no solo elegir de opciones predefinidas. Puede escribir lo que necesite llevar.",
+      "type": "feature",
+      "priority": "high"
     }
   ]
 }
