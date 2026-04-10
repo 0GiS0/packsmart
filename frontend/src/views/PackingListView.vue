@@ -15,6 +15,11 @@ const showAddModal = ref(false)
 const newItemName = ref('')
 const newItemCategory = ref('Personal')
 
+// Share modal
+const showShareModal = ref(false)
+const shareSuccess = ref(false)
+const copySuccess = ref(false)
+
 const availableCategories = [
   'Ropa',
   'Higiene',
@@ -98,6 +103,87 @@ const addCustomItem = () => {
     closeAddModal()
   }
 }
+
+// Share functionality
+const generateShareText = () => {
+  if (!tripStore.trip) return ''
+  
+  let text = `🧳 Lista de equipaje para ${tripStore.trip.destination}\n`
+  text += `📅 ${formatDate(tripStore.trip.startDate)} - ${formatDate(tripStore.trip.endDate)} (${tripStore.tripDuration} días)\n`
+  text += `🎯 ${tripStore.trip.activities.map(a => activityNames[a]).join(', ')}\n\n`
+  
+  const grouped: Record<string, typeof tripStore.packingItems> = {}
+  for (const item of tripStore.packingItems) {
+    if (!grouped[item.category]) grouped[item.category] = []
+    grouped[item.category].push(item)
+  }
+  
+  for (const [category, items] of Object.entries(grouped)) {
+    text += `${categoryIcons[category] || '📦'} ${category}:\n`
+    for (const item of items) {
+      const check = item.packed ? '✅' : '⬜'
+      text += `  ${check} ${item.name}\n`
+    }
+    text += '\n'
+  }
+  
+  text += `\nProgreso: ${tripStore.packedCount}/${tripStore.totalCount} (${tripStore.progress}%)\n`
+  text += `\n\u00a1Creado con PackSmart! 🧳✈️`
+  
+  return text
+}
+
+const canShare = computed(() => {
+  return typeof navigator !== 'undefined' && !!navigator.share
+})
+
+const openShareModal = () => {
+  shareSuccess.value = false
+  copySuccess.value = false
+  showShareModal.value = true
+}
+
+const closeShareModal = () => {
+  showShareModal.value = false
+}
+
+const shareNative = async () => {
+  const text = generateShareText()
+  try {
+    await navigator.share({
+      title: `Lista de equipaje - ${tripStore.trip?.destination}`,
+      text: text
+    })
+    shareSuccess.value = true
+    setTimeout(() => closeShareModal(), 1500)
+  } catch (err) {
+    console.log('Share cancelled')
+  }
+}
+
+const copyToClipboard = async () => {
+  const text = generateShareText()
+  try {
+    await navigator.clipboard.writeText(text)
+    copySuccess.value = true
+    setTimeout(() => {
+      copySuccess.value = false
+    }, 2000)
+  } catch (err) {
+    console.error('Failed to copy')
+  }
+}
+
+const shareViaWhatsApp = () => {
+  const text = encodeURIComponent(generateShareText())
+  window.open(`https://wa.me/?text=${text}`, '_blank')
+}
+
+const shareViaEmail = () => {
+  const subject = encodeURIComponent(`Lista de equipaje - ${tripStore.trip?.destination}`)
+  const body = encodeURIComponent(generateShareText())
+  window.open(`mailto:?subject=${subject}&body=${body}`, '_blank')
+}
 </script>
 
 <template>
@@ -105,13 +191,22 @@ const addCustomItem = () => {
     <div class="max-w-3xl mx-auto">
       <!-- Header -->
       <div class="text-center mb-6">
-        <button 
-          @click="router.push('/trip')"
-          class="inline-flex items-center gap-2 text-blue-600 hover:text-blue-700 mb-4"
-        >
-          <span>←</span>
-          <span>Editar viaje</span>
-        </button>
+        <div class="flex items-center justify-between mb-4">
+          <button 
+            @click="router.push('/trip')"
+            class="inline-flex items-center gap-2 text-blue-600 hover:text-blue-700"
+          >
+            <span>←</span>
+            <span>Editar viaje</span>
+          </button>
+          <button
+            @click="openShareModal"
+            class="inline-flex items-center gap-2 px-4 py-2 bg-blue-100 text-blue-600 rounded-xl hover:bg-blue-200 transition-colors"
+          >
+            <span>📤</span>
+            <span>Compartir</span>
+          </button>
+        </div>
         <h1 class="text-3xl font-bold text-gray-800 mb-2">
           🧳 Tu lista de equipaje
         </h1>
@@ -348,7 +443,6 @@ const addCustomItem = () => {
               class="input"
               placeholder="Ej: Cámara instantánea, Libro..."
               @keyup.enter="addCustomItem"
-              ref="nameInput"
             />
           </div>
 
@@ -380,6 +474,90 @@ const addCustomItem = () => {
             Añadir
           </button>
         </div>
+      </div>
+    </div>
+
+    <!-- Share Modal -->
+    <div 
+      v-if="showShareModal"
+      class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4"
+      @click.self="closeShareModal"
+    >
+      <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md p-6 transform transition-all">
+        <div class="flex items-center justify-between mb-6">
+          <h3 class="text-xl font-bold text-gray-800 flex items-center gap-2">
+            <span>📤</span>
+            Compartir lista
+          </h3>
+          <button 
+            @click="closeShareModal"
+            class="text-gray-400 hover:text-gray-600 text-xl"
+          >
+            ✕
+          </button>
+        </div>
+
+        <!-- Success Message -->
+        <div v-if="shareSuccess" class="text-center py-8">
+          <span class="text-5xl block mb-4">✅</span>
+          <p class="text-lg font-semibold text-green-600">¡Compartido con éxito!</p>
+        </div>
+
+        <!-- Share Options -->
+        <div v-else class="space-y-3">
+          <p class="text-gray-500 text-sm mb-4">
+            Comparte tu lista de equipaje con tus compañeros de viaje
+          </p>
+
+          <!-- Native Share (mobile) -->
+          <button
+            v-if="canShare"
+            @click="shareNative"
+            class="w-full flex items-center gap-3 p-4 rounded-xl bg-gradient-to-r from-blue-500 to-blue-600 text-white hover:from-blue-600 hover:to-blue-700 transition-all"
+          >
+            <span class="text-2xl">📱</span>
+            <span class="font-semibold">Compartir</span>
+          </button>
+
+          <!-- WhatsApp -->
+          <button
+            @click="shareViaWhatsApp"
+            class="w-full flex items-center gap-3 p-4 rounded-xl bg-green-500 text-white hover:bg-green-600 transition-all"
+          >
+            <span class="text-2xl">💬</span>
+            <span class="font-semibold">WhatsApp</span>
+          </button>
+
+          <!-- Email -->
+          <button
+            @click="shareViaEmail"
+            class="w-full flex items-center gap-3 p-4 rounded-xl bg-gray-600 text-white hover:bg-gray-700 transition-all"
+          >
+            <span class="text-2xl">📧</span>
+            <span class="font-semibold">Email</span>
+          </button>
+
+          <!-- Copy to Clipboard -->
+          <button
+            @click="copyToClipboard"
+            :class="[
+              'w-full flex items-center gap-3 p-4 rounded-xl transition-all',
+              copySuccess 
+                ? 'bg-green-100 text-green-700 border-2 border-green-300'
+                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+            ]"
+          >
+            <span class="text-2xl">{{ copySuccess ? '✅' : '📋' }}</span>
+            <span class="font-semibold">{{ copySuccess ? '¡Copiado!' : 'Copiar al portapapeles' }}</span>
+          </button>
+        </div>
+
+        <button
+          @click="closeShareModal"
+          class="w-full mt-4 text-gray-500 hover:text-gray-700"
+        >
+          Cerrar
+        </button>
       </div>
     </div>
   </div>
