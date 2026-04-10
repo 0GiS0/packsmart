@@ -1,0 +1,19 @@
+# Dependencies
+node_modules/
+target/
+
+# IDE
+.idea/
+*.iml
+
+# Build outputs
+dist/
+*.class
+
+# Environment
+.env
+*.local
+
+# OS
+.DS_Store
+Thumbs.db

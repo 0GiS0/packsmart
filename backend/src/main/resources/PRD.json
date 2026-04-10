@@ -1,0 +1,36 @@
+{
+  "appName": "PackSmart",
+  "description": "Una app que genera listas de equipaje personalizadas según destino, fechas y actividades, considerando el clima y duración del viaje.",
+  "requirements": [
+    {
+      "title": "Página de inicio",
+      "description": "Landing page principal con información del producto",
+      "priority": "alta"
+    },
+    {
+      "title": "Autenticación de usuarios",
+      "description": "Login y registro con validación de formularios",
+      "priority": "alta"
+    },
+    {
+      "title": "Panel de administración",
+      "description": "Dashboard para gestionar los datos de la aplicación",
+      "priority": "media"
+    },
+    {
+      "title": "API REST completa",
+      "description": "Endpoints CRUD para todas las entidades del dominio",
+      "priority": "alta"
+    },
+    {
+      "title": "Diseño responsive",
+      "description": "Interfaz adaptada a móvil, tablet y escritorio",
+      "priority": "media"
+    },
+    {
+      "title": "Tests unitarios",
+      "description": "Cobertura de tests para la lógica de negocio principal",
+      "priority": "baja"
+    }
+  ]
+}
