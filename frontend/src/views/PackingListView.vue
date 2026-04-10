@@ -10,6 +10,24 @@ const tripStore = useTripStore()
 type FilterType = 'all' | 'pending' | 'packed'
 const activeFilter = ref<FilterType>('all')
 
+// Add item modal
+const showAddModal = ref(false)
+const newItemName = ref('')
+const newItemCategory = ref('Personal')
+
+const availableCategories = [
+  'Ropa',
+  'Higiene',
+  'Electrónica',
+  'Documentos',
+  'Salud',
+  'Playa',
+  'Senderismo',
+  'Ciudad',
+  'Crucero',
+  'Personal'
+]
+
 onMounted(() => {
   if (!tripStore.trip) {
     router.push('/trip')
@@ -63,10 +81,27 @@ const activityNames: Record<string, string> = {
 const handleToggle = (itemId: string) => {
   tripStore.toggleItemPacked(itemId)
 }
+
+const openAddModal = () => {
+  newItemName.value = ''
+  newItemCategory.value = 'Personal'
+  showAddModal.value = true
+}
+
+const closeAddModal = () => {
+  showAddModal.value = false
+}
+
+const addCustomItem = () => {
+  if (newItemName.value.trim()) {
+    tripStore.addCustomItem(newItemName.value.trim(), newItemCategory.value)
+    closeAddModal()
+  }
+}
 </script>
 
 <template>
-  <div class="min-h-screen py-8 px-4" v-if="tripStore.trip">
+  <div class="min-h-screen py-8 px-4 pb-24" v-if="tripStore.trip">
     <div class="max-w-3xl mx-auto">
       <!-- Header -->
       <div class="text-center mb-6">
@@ -139,7 +174,7 @@ const handleToggle = (itemId: string) => {
       </div>
 
       <!-- Filter Tabs -->
-      <div class="flex gap-2 mb-6">
+      <div class="flex gap-2 mb-6 flex-wrap">
         <button
           @click="activeFilter = 'all'"
           :class="[
@@ -273,6 +308,78 @@ const handleToggle = (itemId: string) => {
         <span class="text-5xl mb-4 block">🧳</span>
         <h3 class="text-xl font-bold text-gray-700 mb-2">Lista vacía</h3>
         <p class="text-gray-500">No hay artículos en tu lista de equipaje</p>
+      </div>
+    </div>
+
+    <!-- Floating Add Button -->
+    <button
+      @click="openAddModal"
+      class="fixed bottom-6 right-6 w-14 h-14 bg-gradient-to-r from-orange-400 to-orange-500 text-white rounded-full shadow-lg hover:shadow-xl transform hover:scale-110 transition-all duration-200 flex items-center justify-center text-2xl z-10"
+    >
+      +
+    </button>
+
+    <!-- Add Item Modal -->
+    <div 
+      v-if="showAddModal"
+      class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4"
+      @click.self="closeAddModal"
+    >
+      <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md p-6 transform transition-all">
+        <div class="flex items-center justify-between mb-6">
+          <h3 class="text-xl font-bold text-gray-800 flex items-center gap-2">
+            <span>➕</span>
+            Añadir artículo
+          </h3>
+          <button 
+            @click="closeAddModal"
+            class="text-gray-400 hover:text-gray-600 text-xl"
+          >
+            ✕
+          </button>
+        </div>
+
+        <div class="space-y-4">
+          <div>
+            <label class="label">Nombre del artículo</label>
+            <input
+              v-model="newItemName"
+              type="text"
+              class="input"
+              placeholder="Ej: Cámara instantánea, Libro..."
+              @keyup.enter="addCustomItem"
+              ref="nameInput"
+            />
+          </div>
+
+          <div>
+            <label class="label">Categoría</label>
+            <select v-model="newItemCategory" class="input">
+              <option v-for="cat in availableCategories" :key="cat" :value="cat">
+                {{ categoryIcons[cat] || '📦' }} {{ cat }}
+              </option>
+            </select>
+          </div>
+        </div>
+
+        <div class="flex gap-3 mt-6">
+          <button
+            @click="closeAddModal"
+            class="flex-1 btn btn-outline"
+          >
+            Cancelar
+          </button>
+          <button
+            @click="addCustomItem"
+            :disabled="!newItemName.trim()"
+            :class="[
+              'flex-1 btn',
+              newItemName.trim() ? 'btn-secondary' : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+            ]"
+          >
+            Añadir
+          </button>
+        </div>
       </div>
     </div>
   </div>
