@@ -1,19 +1,22 @@
-/**
- * Shared TypeScript types.
- * Define your API response shapes here.
- */
 export interface Requirement {
   id: number
   title: string
   description: string
-  priority: string
-  status: 'PENDING' | 'IN_PROGRESS' | 'DONE'
-  createdAt: string
-  updatedAt: string
 }
 
-export interface HealthStatus {
-  status: string
-  app: string
-  version: string
+export type ActivityType = 'beach' | 'hiking' | 'city' | 'cruise'
+
+export interface Trip {
+  destination: string
+  startDate: string
+  endDate: string
+  activities: ActivityType[]
+}
+
+export interface PackingItem {
+  id: string
+  name: string
+  category: string
+  packed: boolean
+  isCustom: boolean
 }
